@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Task List{% endblock %}
+
+{% block content %}
+<h2 class="my-4">Task List</h2>
+
+<div class="container">
+    {% for task in tasks %}
+        <form method="POST" class="mb-4">
+            {% csrf_token %}
+            
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Due Date</th>
+                        <th>Completed</th>
+                        <th>Comments</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!-- Title (Editable by Manager) -->
+                        <td>
+                            {% if request.user.user_type == 'manager' %}
+                                <input type="text" name="title" class="form-control" value="{{ task.title }}" required>
+                            {% else %}
+                                <p>{{ task.title }}</p>
+                            {% endif %}
+                        </td>
+
+                        <!-- Description (Editable by Manager) -->
+                        <td>
+                            {% if request.user.user_type == 'manager' %}
+                                <textarea name="description" class="form-control" required>{{ task.description }}</textarea>
+                            {% else %}
+                                <p>{{ task.description }}</p>
+                            {% endif %}
+                        </td>
+
+                        <!-- Due Date (Editable by Manager) -->
+                        <td>
+                            {% if request.user.user_type == 'manager' %}
+                                <input type="datetime-local" name="due_date" class="form-control" value="{{ task.due_date|date:'Y-m-d\TH:i' }}" required>
+                            {% else %}
+                                <p>{{ task.due_date }}</p>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Completed Checkbox (Editable by Employee) -->
+                        <td>
+                            {% if request.user.user_type == 'manager' %}
+                                <input type="checkbox" class="form-check-input" disabled {% if task.completed %}checked{% endif %}>
+                            {% else %}
+                                <input type="checkbox" name="completed" value="on" class="form-check-input" {% if task.completed %}checked{% endif %}>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Comments (Editable by Employee) -->
+                        <td>
+                            {% if request.user.user_type == 'manager' %}
+                                <textarea name="comments" class="form-control">{{ task.comments }}</textarea>
+                            {% else %}
+                                <textarea name="comments" class="form-control">{{ task.comments }}</textarea>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                            <input type="hidden" name="task_id" value="{{ task.id }}">
+                            {% if request.user.user_type == 'manager' %}
+                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                            {% elif request.user.user_type == 'employee' %}
+                                <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    {% endfor %}
+</div>
+
+{% endblock %}

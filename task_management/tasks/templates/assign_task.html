@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Task</title>
+</head>
+<body>
+    <h2>Assign Task</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="title">Task Title:</label>
+        <input type="text" name="title" required><br>
+
+        <label for="description">Description:</label>
+        <textarea name="description" required></textarea><br>
+
+        <label for="assigned_to">Assign To:</label>
+        <select name="assigned_to" required>
+            {% for employee in employees %}
+                <option value="{{ employee.id }}">{{ employee.username }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="due_date">Due Date:</label>
+        <input type="datetime-local" name="due_date" required><br>
+
+        <button type="submit">Assign Task</button>
+    </form>
+</body>
+</html>
